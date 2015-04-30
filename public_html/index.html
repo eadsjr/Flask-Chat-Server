@@ -6,14 +6,25 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <!-- TODO: consider replacing local libraries with cacheble public urls -->
-        <script src="js/libs/jquery/jquery.min.js"></script>
-        <script src="js/libs/backbone.js/backbone.js"></script>
-        <script src="js/libs/react/JSXTransformer.js"></script>
-        <script src="js/libs/react/react.js"></script>
-        <script src="js/chatserver.js"></script>
+        <!-- TODO: replace all local libraries with cacheble public urls -->
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+        <script type="text/javascript" src="js/lib/backbone.js/backbone.js"></script>
+        <script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>
+        <script type="text/javascript" src="js/lib/react/react.js"></script>
+        <script type="text/javascript" src="js/chatserver.js"></script>
     </head>
     <body>
-        <div></div>
+        <h1>Chat Server</h1>
+        <div class="header-bar">
+            <form id="name-select" method="POST" action="#">
+            Name: <input type="text" name="name-select-text-input" id="name-select-text-input" placeholder="e.g. WillC" >
+            </form>
+            <form id="start-conversation" method="POST" action="#">
+            <!--Start a Conversation: <input type="text" name="start-conversation-data" id="start-conversation-data" placeholder="e.g. WillC" >-->
+            Start a Conversation: <select id="start-conversation-select"></select>
+            </form>
+        </div>
+        <button name="debug" id="debug" type="button" onclick="doDebug()">DEBUG</button>
     </body>
 </html>
