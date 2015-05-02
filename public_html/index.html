@@ -9,10 +9,9 @@
         <!-- TODO: replace all local libraries with cacheble public urls -->
         <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-        <script type="text/javascript" src="js/lib/backbone.js/backbone.js"></script>
+        <!--<script type="text/javascript" src="js/lib/backbone.js/backbone.js"></script>-->
         <script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>
         <script type="text/javascript" src="js/lib/react/react.js"></script>
-        <script type="text/javascript" src="js/chatserver.js"></script>
     </head>
     <body>
         <h1>Chat Server</h1>
@@ -26,5 +25,8 @@
             </form>
         </div>
         <button name="debug" id="debug" type="button" onclick="doDebug()">DEBUG</button>
+        <div id="content"></div>
+        <script type="text/jsx;harmony=true" src="js/chatserverreact.js"></script>
+		<script type="text/javascript" src="js/chatserver.js"></script>
     </body>
 </html>

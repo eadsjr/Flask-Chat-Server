@@ -5,8 +5,8 @@
 //alert("yo!");
 console.log("running");
 
+// Communicate with backend via websocket
 var socket = '';
-
 $(document).ready(function(){
     console.log("document is ready");
     namespace = '';
@@ -40,3 +40,4 @@ function doDebug() {
     //socket.emit('event1','button pressed');
     socket.emit('retrieve-usernames');
 }
+
