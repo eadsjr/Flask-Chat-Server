@@ -26,12 +26,24 @@ $(document).ready(function(){
 							updateUsersDropdown(json.data);
 							});
 				  
+				  // Request usernames for dropdown
+				  socket.emit('retrieve-usernames');
 
 				  // Add event handler for dropdown
 				  $("#start-conversation-select").on( "change", function(event) {startConversation(event.currentTarget.value)} );
 				  
+				  // Add event handler for Name change
+				  $("#name-select-text-input").on("change",function(event){changeName(event.currentTarget.value)})
+				  
 				  });
 
+
+
+// Change user's name
+function changeName(name) {
+	//
+	console.log("name changed to %s", name);
+}
 
 // Create a new conversation window
 function startConversation(username) {
@@ -56,7 +68,6 @@ function doDebug() {
 	
 	//var socket = io.connect();
 	
-	//socket.emit('event1','button pressed');
-	socket.emit('retrieve-usernames');
+	socket.emit('event1','button pressed');
 }
 
