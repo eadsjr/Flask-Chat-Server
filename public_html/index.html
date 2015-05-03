@@ -5,28 +5,44 @@
         <title>Jason Eads' Chat Server</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+			
+		
+		
+		<!-- TODO: replace all local libraries with cacheble public urls -->
+<!--		<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>-->
+		        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+		<!--<script type="text/javascript" src="js/lib/backbone.js/backbone.js"></script>-->
+		<script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>
+		<script type="text/javascript" src="js/lib/react/react.js"></script>
+		
         <!-- TODO: replace all local libraries with cacheble public urls -->
-        <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-        <!--<script type="text/javascript" src="js/lib/backbone.js/backbone.js"></script>-->
-        <script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>
-        <script type="text/javascript" src="js/lib/react/react.js"></script>
-    </head>
+<!--        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>-->
+<!--		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>-->
+<!--		<script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>-->
+<!--		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.2/JSXTransformer.js"></script>-->
+<!--		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react.min.js"></script>-->
+<!--		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react-with-addons.min.js"></script>-->
+
+
+
+
+
+	</head>
     <body>
         <h1>Chat Server</h1>
         <div class="header-bar">
             <form id="name-select" method="POST" action="#">
-            Name: <input type="text" name="name-select-text-input" id="name-select-text-input" placeholder="e.g. WillC" >
+            Name: <input type="text" name="name-select-text-input" id="name-select-text-input" placeholder="example" >
             </form>
             <form id="start-conversation" method="POST" action="#">
-            <!--Start a Conversation: <input type="text" name="start-conversation-data" id="start-conversation-data" placeholder="e.g. WillC" >-->
-            Start a Conversation: <select id="start-conversation-select"></select>
+<!--            Start a Conversation: <select id="start-conversation-select" onselect="startConversation()"></select>-->
+		Start a Conversation: <select id="start-conversation-select"></select>
             </form>
         </div>
         <button name="debug" id="debug" type="button" onclick="doDebug()">DEBUG</button>
-        <div id="content"></div>
-        <script type="text/jsx;harmony=true" src="js/chatserverreact.js"></script>
+        <div id="content">CONTENT HERE</div>
 		<script type="text/javascript" src="js/chatserver.js"></script>
+        <script type="text/jsx;harmony=true" src="js/chatserverreact.js"></script>
     </body>
 </html>
