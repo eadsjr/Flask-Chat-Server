@@ -4,6 +4,9 @@
 
 // TODO: Current the pattern of using Username as conversation ID allows for multiple elements to end up with the same id. This should be rectified with something, like a counter.
 
+// TODO: Ensure dom interactions play nice with React classes
+
+var myName = "You";
 
 
 // React classes define buildable components
@@ -50,9 +53,41 @@ var Conversation = React.createClass({
 		this.getDOMNode().parentNode.classList.add("empty");
 		this.getDOMNode().remove();
 	},
+	keypress: function(event) {
+									 if(event.key == "Enter") {
+										var message = event.target.value;
+										event.target.value = "";
+									 
+										// TODO: clean this up.
+										var messageList = event.target.parentNode.parentNode.firstChild;
+										
+									 
+									 
+									 
+										console.log("sending message: " + message);
+									 
+									 var div = document.createElement("div");
+									 div.style.hidden = "true";
+									 
+										React.render(
+													 <Message author={myName} text={message} />,
+													 div
+													 );
+									 
+									 messageList.appendChild( div.firstChild );
+									 
+									 div.remove;
+									 
+//										console.log("sent message: " + message);
+									 
+//										console.log(event);
+										
+									 
+									 }
+//									 console.log("meh");
+	},
 									 
     render: function() {
-									 
 		//$(".conversationHeaderExitButton").on("change",function(event){changeName(event.currentTarget.value)})
 //		this.textinputid = this.props.id + "-text";
 //		this.exitbuttonfunc = "closeButtonFunction("+ this.props.id +")";
@@ -70,12 +105,9 @@ var Conversation = React.createClass({
                     </div>
                     <div className="conversationBody">
 						<div className="conversationBodyMessages">
-							<Message author="Jimmy" text="I gotta go..." />
-							<Message author="Jimmy" text="The quick brown fox jumps over the lazy dog." />
-							<Message author="Death" text="There is nothing more to say." />
 						</div>
 						<div className="conversationBodyInput" id={this.textinputid} >
-							<input className="conversationBodyInputText" type="text" />
+							<input className="conversationBodyInputText" type="text" onKeyDown={this.keypress} />
 						</div>
                     </div>
                 </div>
@@ -183,16 +215,112 @@ $(document).ready(function(){
 				  $("#name-select-text-input").on("change",function(event){changeName(event.currentTarget.value)})
 				  
 				  
+				  initializeDummyMessages();
 				  
 				  });
 
 
+//
+function initializeDummyMessages() {
+	
+	
+	var div = document.createElement("div");
+	div.style.hidden = "true";
+	var messageList = $("#Jimmy .conversationBodyMessages")[0];
+	
+	React.render(
+				 <Message author="Jimmy" text="Are Polysaccrides are bad for you?" />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+	
+	
+	React.render(
+				 <Message author="You" text="...what?" />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+
+	React.render(
+				 <Message author="Jimmy" text="nevermind..." />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+
+	messageList = $("#Alucard .conversationBodyMessages")[0];
+	
+	React.render(
+				 <Message author="You" text="Is it really you?" />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+
+	React.render(
+				 <Message author="You" text="Hello?" />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+
+	
+	messageList = $("#Bernard .conversationBodyMessages")[0];
+
+	React.render(
+				 <Message author="Bernard" text="I had a dream last night." />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+	
+	React.render(
+				 <Message author="Bernard" text="Isn't that interesting?" />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+	
+
+	
+	React.render(
+				 <Message author="Bernard" text="The quick brown fox jumps over the lazy dog." />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+	
+	
+	messageList = $("#Joel .conversationBodyMessages")[0];
+	
+	
+	React.render(
+				 <Message author="Joel" text="Lorem ipsum dolor sit amet, quo labore temporibus dissentiet in, nibh option vidisse vel ut. Euismod denique at eos. Ea eam iriure legendos intellegat. Liber gubergren ei mei. Te sumo ferri nam, duo nonumy pertinacia ne, ne alii viris definitionem qui." />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+
+	
+	
+	React.render(
+				 <Message author="Joel" text="Doctus quaeque probatus nec ex, ut ludus munere democritum has. Labores albucius instructior eum in, ea erat dicta inani has, ei quo oblique suscipiantur comprehensam. Iisque vivendo probatus nec no, tota equidem habemus vel at, quo ei justo iisque. Nam adhuc lucilius persequeris ne, ei quis mazim denique pro. Postea option eligendi nam no, diceret ancillae consulatu ea mea, ad sed primis discere postulant. Mei id regione discere consulatu." />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+
+	
+	div.remove;
+	
+	//							<Message author="Death" text="There is nothing more to say." />
+}
+
 // Change user's name
 function changeName(name) {
+	var oldName = myName;
+	myName = name;
+	
+	//TODO: security review - user sourced data inserted as HTML
+	$(".message-author span ").filter(":contains('" + oldName + "')").html(name);
+	
 	console.log("name changed to %s", name);
 }
 
 // Create a new conversation window
+// TODO: Does not guard against multiple conversations with same person
 function startConversation(username) {
 	if(username == "") {
 		return;

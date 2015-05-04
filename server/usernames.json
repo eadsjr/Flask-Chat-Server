@@ -1,5 +1,11 @@
 [
 	{
+		"username": "Jimmy"
+	},
+	{
+		"username": "Joel"
+	},
+	{
 		"username": "Xavier"
 	},
 	{
@@ -7,5 +13,14 @@
 	},
 	{
 		"username": "Albus Percival Wulfrick Dumbledore"
+	},
+	{
+		"username": "SourGrapes"
+	},
+	{
+		"username": "Bernard"
+	},
+	{
+		"username": "Alucard"
 	}
 ]
