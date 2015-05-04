@@ -88,6 +88,8 @@
 	border-bottom: solid black 2px;
 	padding: 8px;
 	padding-left: 12px;
+	height: 22px;
+	overflow: hidden;
 }
 
 .conversationHeaderParticipant {
