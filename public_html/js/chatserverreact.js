@@ -48,7 +48,15 @@ var Conversation = React.createClass({
                     <div className="conversationBody">
 						<div className="conversationBodyMessages">
 							<Message author="Jimmy" text="I gotta go..." />
-							<Message author="Jimmy" text="The quick brown fox jumps over the lazy dog." />
+				<Message author="Jimmy" text="The quick brown fox jumps over the lazy dog." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
+				<Message author="Death" text="There is nothing more to say." />
 						</div>
 						<div className="conversationBodyInput" id={this.textinputid} >
 							<input className="conversationBodyInputText" type="text" />

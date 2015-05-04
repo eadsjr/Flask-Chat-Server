@@ -116,6 +116,7 @@
 .conversationBodyMessages {
 /*	float: left;*/
 /*display: float;*/
+	overflow: scroll;
 	padding: 4px;
 	flex: 1 1 auto;
 }
@@ -123,6 +124,7 @@
 .conversationBodyInput {
 	border-top: solid black 2px;
 	padding: 0px;
+	flex: 0 0 26px;
 /*	clear: both;*/
 /*	border-top: solid black 2px;*/
 /*	flex: 0 1 40px;*/
