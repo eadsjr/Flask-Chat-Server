@@ -33,29 +33,39 @@ var ConversationTable = React.createClass({
 
 
 var Conversation = React.createClass({
+									 getInitialState: function() {
+									 return {theid: ''};
+									 },
+//	gettheid : function(){
+//			return "i'm from the class";
+//	},
+									 doIT: function(){
+									 console.log(this.props);
+									 },
     render: function() {
+									 
+									 
+									 
+									 
 		//$(".conversationHeaderExitButton").on("change",function(event){changeName(event.currentTarget.value)})
 //		this.textinputid = this.props.id + "-text";
 //		this.exitbuttonfunc = "closeButtonFunction("+ this.props.id +")";
+									 //						<div className="conversationHeaderExitButton" onClick={this.props.closeFunc}>X</div>
+									 this.state.theid = this.props.id;
+									 
+									 //			{this.props.id}
         return (
-                <div className="conversation" id={this.props.id}>
+				<div className="conversation" id={this.state.theid}>
                     <div className="conversationHeader">
                         <div className="conversationHeaderParticipant">
                             {this.props.participant}
                         </div>
-						<div className="conversationHeaderExitButton" onClick={this.props.closeFunc}>X</div>
+				<div className="conversationHeaderExitButton" onClick={this.doIT}>X</div>
                     </div>
                     <div className="conversationBody">
 						<div className="conversationBodyMessages">
 							<Message author="Jimmy" text="I gotta go..." />
 				<Message author="Jimmy" text="The quick brown fox jumps over the lazy dog." />
-				<Message author="Death" text="There is nothing more to say." />
-				<Message author="Death" text="There is nothing more to say." />
-				<Message author="Death" text="There is nothing more to say." />
-				<Message author="Death" text="There is nothing more to say." />
-				<Message author="Death" text="There is nothing more to say." />
-				<Message author="Death" text="There is nothing more to say." />
-				<Message author="Death" text="There is nothing more to say." />
 				<Message author="Death" text="There is nothing more to say." />
 						</div>
 						<div className="conversationBodyInput" id={this.textinputid} >
@@ -89,10 +99,16 @@ React.render(
 			 document.getElementById('content')
 );
 
-
-function closeButtonFunction(conversationId) {
+// (this.props.id)
+//function closeButtonFunction(conversationId) {
+function closeButtonFunction(event) {
+//		var m = this.gettheid();
 	console.log("inside function closeButtonFunction");
-	console.log(conversationId);
+	console.log(event);
+	console.log(event.target.parentNode.parentNode.id);
+	
+	
+//	console.log(conversationId);
 }
 
 /*
