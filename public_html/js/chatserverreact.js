@@ -7,27 +7,18 @@ var Conversation = React.createClass({
     render: function() {
         return (
                 <div className="conversation">
-                    //header
                     <div className="conversationHeader">
                         <h2 className="conversationHeaderParticipant">
                             {this.props.participant}
                         </h2>
-                        <button className="conversationHeaderExit" id={this.props.exitButtonId}>X</button>
+                        <div className="conversationHeaderExitButton" id={this.props.exitButtonId}>X</div>
                     </div>
-
-                    //body
                     <div className="conversationBody">
                         <Message author="jimmy" text="I gotta go..." />
-                        //
                     </div>
-                    
-                    //Footer
                     <form className="conversationForm" id={this.props.id} >
                         <input className="conversationInput" type="text" />
                     </form>
-            
-                    Rats, it won't render
-
                 </div>
                     );
     }
@@ -44,9 +35,9 @@ var Message = React.createClass({
     }
 });
 
+//			 <Message author="jimmy" text="I gotta go..." />,
 React.render(
-			 <Conversation participant="jimmy" />
-			 <Message author="jimmy" text="I gotta go..." />,
+			 <Conversation participant="jimmy" />,
         document.getElementById('content')
 );
 

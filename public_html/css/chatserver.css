@@ -1,0 +1,113 @@
+
+
+/*@font-face {*/
+/*	font-family: HelviticaNeue;*/
+/*	src: url(fonts/HelviticaNeue/HelviticaNeue.woff);*/
+/*}*/
+
+
+* {
+	font-family: HelviticaNeue, sans-serif;
+/*	font-family: Helvetica;*/
+}
+
+.header-title {
+	font-size: 40px;
+	/*	font: 40px bold sans-serif;*/
+	/*	font-style: sans-serif;*/
+	margin-bottom: 20px;
+}
+
+
+#name-select-text-input, #start-conversation-select, .header-bar {
+	border: solid black 2px;
+}
+
+#name-select-text-input {
+	margin-right: 120px;
+}
+
+.header-bar {
+/*	position: static;*/
+	padding-bottom: 8px;
+	padding-top: 10px;
+	padding-left: 32px;
+	padding-right: 32px;
+	width: 550px;
+	margin-bottom: 30px;
+}
+
+
+
+
+
+
+/*
+ 
+ <div className="conversation">
+ <div className="conversationHeader">
+ <h2 className="conversationHeaderParticipant">
+ {this.props.participant}
+ </h2>
+ <button className="conversationHeaderExit" id={this.props.exitButtonId}>X</button>
+ </div>
+ <div className="conversationBody">
+ <Message author="jimmy" text="I gotta go..." />
+ </div>
+ <form className="conversationForm" id={this.props.id} >
+ <input className="conversationInput" type="text" />
+ </form>
+ </div>
+ 
+ */
+
+
+.conversation {
+	border: solid black 2px;
+	width: 200px;
+	height: 250px;
+}
+
+.conversationHeader {
+	border-bottom: solid black 2px;
+	padding: 8px;
+}
+
+.conversationBody {
+	border-bottom: solid black 2px;	
+}
+
+
+/*.conversationHeaderExitButton*/
+
+
+
+/*.header-bar-separator {*/
+/*	clear: none;*/
+/*	width: 80px;*/
+/**/
+/*	height: 1px;*/
+/*}*/
+
+
+/*#header-bar {*/
+/*	border: black 2px;*/
+/*	border-style: solid;*/
+/*}*/
+/**/
+/*#name-select-text-input {*/
+/*	border: black 2px;*/
+/*	border-style: solid;*/
+/*}*/
+/**/
+/*#start-conversation-select {*/
+/*	border: black 2px;*/
+/*	border-style: solid;*/
+/*}*/
+
+/** {*/
+/*	border: red 1px;*/
+/*	border-style: solid;*/
+/*}*/
+
+
