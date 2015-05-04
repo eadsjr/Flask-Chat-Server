@@ -80,6 +80,7 @@
 	width: 200px;
 	height: 250px;
 	margin-right: 20px;
+	margin-bottom: 20px;
 /*	display: flex;*/
 }
 
@@ -103,34 +104,71 @@
 }
 
 .conversationBody {
-/*	display: flex;*/
+	display: flex;
+	flex-flow: column;
 /*	width: 200px;*/
-/*	height: 240px;*/
+	height: 210px;
 /*	padding: none;*/
 /*	margin: none;*/
 /*	border-bottom: solid green;*/
 }
 
 .conversationBodyMessages {
+/*	float: left;*/
+/*display: float;*/
+	padding: 4px;
+	flex: 1 1 auto;
 }
 
 .conversationBodyInput {
 	border-top: solid black 2px;
+	padding: 0px;
+/*	clear: both;*/
+/*	border-top: solid black 2px;*/
+/*	flex: 0 1 40px;*/
 /*	height: 30pxs;*/
 /*	align-self: flex-end;*/
 }
 
 .conversationBodyInputText {
-	width: 194px;
-	border-color: red;
+	width: 192px;
+	height: 18px;
+/*	height: 120%;*/
+	margin: 0px;
+	border: 0px;
+	padding: 4px;
+	border-color: transparent;
+/*	border-top: solid black 2px;*/
 /*	border: none;*/
 /*	margin: none;*/
 }
+
+/*.conversationBodyInputText:focus{*/
+/*	outline:none;*/
+/*}*/
 
 
 /*.conversationHeaderExitButton*/
 
 
+
+
+/*
+ Message formatting
+ */
+
+.message {
+	padding: 2px;
+}
+
+.message-author {
+	font-style: italic;
+}
+
+.message-text {
+/*	font-style: ;*/
+
+}
 
 /*.header-bar-separator {*/
 /*	clear: none;*/

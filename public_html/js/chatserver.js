@@ -35,7 +35,12 @@ $(document).ready(function(){
 				  // Add event handler for Name change
 				  $("#name-select-text-input").on("change",function(event){changeName(event.currentTarget.value)})
 				  
+				  
+				  
 				  });
+
+
+
 
 
 
