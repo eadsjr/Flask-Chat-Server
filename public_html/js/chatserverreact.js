@@ -33,14 +33,12 @@ var ConversationTable = React.createClass({
 
 
 var Conversation = React.createClass({
-									 getInitialState: function() {
-									 return {theid: ''};
-									 },
-//	gettheid : function(){
-//			return "i'm from the class";
-//	},
-									 doIT: function(){
+									 close: function(){
+									 
 									 console.log(this.props);
+									 console.log("Closing conversation");
+									 this.getDOMNode().remove();
+									 
 									 },
     render: function() {
 									 
@@ -51,16 +49,16 @@ var Conversation = React.createClass({
 //		this.textinputid = this.props.id + "-text";
 //		this.exitbuttonfunc = "closeButtonFunction("+ this.props.id +")";
 									 //						<div className="conversationHeaderExitButton" onClick={this.props.closeFunc}>X</div>
-									 this.state.theid = this.props.id;
+//									 this.state.theid = this.props.id;
 									 
 									 //			{this.props.id}
         return (
-				<div className="conversation" id={this.state.theid}>
+				<div className="conversation" id={this.props.id}>
                     <div className="conversationHeader">
                         <div className="conversationHeaderParticipant">
                             {this.props.participant}
                         </div>
-				<div className="conversationHeaderExitButton" onClick={this.doIT}>X</div>
+				<div className="conversationHeaderExitButton" onClick={this.close}>X</div>
                     </div>
                     <div className="conversationBody">
 						<div className="conversationBodyMessages">
