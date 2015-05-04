@@ -6,29 +6,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 			
-<!--		<style >-->
 		<link rel="stylesheet" href="css/chatserver.css">
-
-		<!-- TODO: replace all local libraries with cacheble public urls -->
-<!--		<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>-->
 		        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+				<!-- newer version of socket.io appears to be incompatible with some flash installs -->
 <!--						<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>-->
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-		<!--<script type="text/javascript" src="js/lib/backbone.js/backbone.js"></script>-->
-<!--		<script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>-->
-<!--		<script type="text/javascript" src="js/lib/react/react.js"></script>-->
-
-        <!-- TODO: replace all local libraries with cacheble public urls -->
-<!--        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>-->
-<!--		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>-->
-<!--		<script type="text/javascript" src="js/lib/react/JSXTransformer.js"></script>-->
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.2/JSXTransformer.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react.min.js"></script>
-<!--		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/react/0.13.2/react-with-addons.min.js"></script>-->
-
-
-
-
 
 	</head>
     <body>
@@ -36,17 +20,10 @@
 
         <div class="header-title">Chat Server</div>
         <div class="header-bar">
-<!--            <form id="name-select" method="" action="">-->
             Name: <input type="text" name="name-select-text-input" id="name-select-text-input" placeholder="example" >
-<!--            </form>  onkeydown="" onkeypress="" -->
-<!--            <form id="start-conversation" method="" action="">-->
-<!--            Start a Conversation: <select id="start-conversation-select" onselect="startConversation()"></select>-->
-<!--			<div class="header-bar-separator"></div>-->
-<!--		\t\t<t/><t/>-->
-		Start a Conversation: <select id="start-conversation-select"></select>
-<!--            </form>-->
+			Start a Conversation: <select id="start-conversation-select"></select>
         </div>
-        <div id="content">CONTENT HERE</div>
+        <div id="content">CONTENT LOADING...</div>
 		
 		
 		

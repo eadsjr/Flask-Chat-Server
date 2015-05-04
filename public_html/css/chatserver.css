@@ -11,13 +11,19 @@
 /*	font-family: Helvetica;*/
 }
 
+
+
+
+/*
+ Formatting for the page header
+ */
+
 .header-title {
 	font-size: 40px;
 	/*	font: 40px bold sans-serif;*/
 	/*	font-style: sans-serif;*/
-	margin-bottom: 20px;
+	margin-bottom: 14px;
 }
-
 
 #name-select-text-input, #start-conversation-select, .header-bar {
 	border: solid black 2px;
@@ -27,13 +33,17 @@
 	margin-right: 120px;
 }
 
+#start-conversation-select {
+	width: 120px;
+}
+
 .header-bar {
 /*	position: static;*/
 	padding-bottom: 8px;
 	padding-top: 10px;
 	padding-left: 32px;
 	padding-right: 32px;
-	width: 550px;
+	width: 595px;
 	margin-bottom: 30px;
 }
 
@@ -61,20 +71,60 @@
  
  */
 
+/*
+ Formatting the conversation boxes
+ */
 
 .conversation {
 	border: solid black 2px;
 	width: 200px;
 	height: 250px;
+	margin-right: 20px;
+/*	display: flex;*/
 }
 
 .conversationHeader {
 	border-bottom: solid black 2px;
 	padding: 8px;
+	padding-left: 12px;
+}
+
+.conversationHeaderParticipant {
+	display: inline;
+	font-size: 22px;
+	font-style:	bold;
+}
+
+.conversationHeaderExitButton {
+	margin-top: -8px;
+	margin-right: -8px;
+	padding: 12px;
+	float: right;
 }
 
 .conversationBody {
-	border-bottom: solid black 2px;	
+/*	display: flex;*/
+/*	width: 200px;*/
+/*	height: 240px;*/
+/*	padding: none;*/
+/*	margin: none;*/
+/*	border-bottom: solid green;*/
+}
+
+.conversationBodyMessages {
+}
+
+.conversationBodyInput {
+	border-top: solid black 2px;
+/*	height: 30pxs;*/
+/*	align-self: flex-end;*/
+}
+
+.conversationBodyInputText {
+	width: 194px;
+	border-color: red;
+/*	border: none;*/
+/*	margin: none;*/
 }
 
 

@@ -3,22 +3,51 @@
  */
 
 // React classes define buildable components
+
+var ConversationTable = React.createClass({
+										 render: function() {
+										 return (
+												 <table>
+													 <tr>
+														<td>
+															<Conversation participant="Jimmy" />
+														</td>
+														<td>
+															<Conversation participant="Alucard" />
+														</td>
+														<td>
+															<Conversation participant="Bernard" />
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<Conversation participant="Joel" />
+														</td>
+													</tr>
+												 </table>
+												 );
+										  }
+										  });
+
+
 var Conversation = React.createClass({
     render: function() {
         return (
                 <div className="conversation">
                     <div className="conversationHeader">
-                        <h2 className="conversationHeaderParticipant">
+                        <div className="conversationHeaderParticipant">
                             {this.props.participant}
-                        </h2>
+                        </div>
                         <div className="conversationHeaderExitButton" id={this.props.exitButtonId}>X</div>
                     </div>
                     <div className="conversationBody">
-                        <Message author="jimmy" text="I gotta go..." />
+						<div className="conversationBodyMessages">
+							<Message author="jimmy" text="I gotta go..." />
+						</div>
+						<div className="conversationBodyInput" id={this.props.id} >
+							<input className="conversationBodyInputText" type="text" />
+						</div>
                     </div>
-                    <form className="conversationForm" id={this.props.id} >
-                        <input className="conversationInput" type="text" />
-                    </form>
                 </div>
                     );
     }
@@ -36,9 +65,14 @@ var Message = React.createClass({
 });
 
 //			 <Message author="jimmy" text="I gotta go..." />,
+//			 <Conversation participant="jimmy" />
+//			 <Conversation participant="Alucard" />,
+//										  <Conversation participant="jimmy"></Conversation>
+//										  <Conversation participant="Alucard"></Conversation>,
+
 React.render(
-			 <Conversation participant="jimmy" />,
-        document.getElementById('content')
+			 <ConversationTable />,
+			 document.getElementById('content')
 );
 
 /*
