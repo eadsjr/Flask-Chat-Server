@@ -1,6 +1,18 @@
-##
-# Copyright 2015 Jason Randolph Eads - all rights reserved
-##
+'''
+ Copyright 2015 Jason Randolph Eads
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ '''
 
 import json
 import uuid
@@ -17,13 +29,17 @@ socketio = SocketIO(app)
 #@app.route('/')
 #@socketio.on('connect', '/chatserver')
 
-#TODO: Needs additional data sanitization
+#TODO: Needs additional data sanitization!
 
+#TODO: JSON file storage
+#	with open('usernames.json', 'r') as file:
+#		usernames = json.loads(file.read())
+#		emit('retrieve-user-data-response', {'data':usernames})
+#		print 'sent usernames'
 
 # User data stored as { PublicID:(Username,PrivateID,ConnectionRoom) }
 # NOTE: should start empty in production
 # TODO: move debug data to extenal file
-# TODO: switch to using private ID as key.
 users = {
 	"JimmysPubID":("Jimmy","JimmysPrivID","JimmysRoom"),
 	"JoelsPubID":("Joel","JoelsPrivID","JoelsRoom"),
@@ -74,10 +90,6 @@ def retrieve_usernames(senderID):
 	print 'user data sent'
 
 
-#	with open('usernames.json', 'r') as file:
-#		usernames = json.loads(file.read())
-#		emit('retrieve-user-data-response', {'data':usernames})
-#		print 'sent usernames'
 
 
 @socketio.on('chat-message')

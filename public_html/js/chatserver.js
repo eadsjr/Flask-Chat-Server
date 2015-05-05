@@ -1,18 +1,30 @@
 /*
- * Copyright 2015 Jason Randolph Eads - all rights reserved
+ Copyright 2015 Jason Randolph Eads
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
  */
-
-// TODO: Ensure DOM interactions play nice with React classes
-
-// TODO: The React components need to be broken down further and logically decoupled
-
-// TODO: Break up into multiple files and require()
 
 // TODO: This version does not make much use of React's primary function... To conform, use React properties instead of JQuery
 
-// TODO: at list selection time, multiple users with same name can cause an issue
+// TODO: The React components need to be broken down further and logically decoupled
 
-// TODO: seperate network-active functions from non-network functions
+// TODO: at list selection time, multiple users with same name can cause the wrong one to be selected
+
+// TODO: Having the same name as another user can cause UI disruption on rename
+
+// TODO: STYLE: Break up into multiple files and require()
+
+// TODO: STYLE: seperate network-active functions from non-network functions
 
 var myName = "You";
 var myId = null;
