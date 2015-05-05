@@ -1,0 +1,3 @@
+Ensure rooms are used instead of broadcast, otherwise message will propagate incorrectly
+js fix updateUser() to also update the otherUsers collection...
+

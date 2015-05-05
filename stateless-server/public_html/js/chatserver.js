@@ -1,0 +1,344 @@
+/*
+ Copyright 2015 Jason Randolph Eads
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+// TODO: This version does not make much use of React's primary function... To conform, use React properties instead of JQuery
+
+// TODO: The React components need to be broken down further and logically decoupled
+
+// TODO: at list selection time, multiple users with same name can cause the wrong one to be selected
+
+// TODO: Having the same name as another user can cause UI disruption on rename
+
+// TODO: STYLE: Break up into multiple files and require()
+
+// TODO: STYLE: seperate network-active functions from non-network functions
+
+
+
+
+/*
+ outgoing message types:
+ 
+	socket.emit('register-name', oldName, newName);
+	chat-message
+ */
+
+var myName = null;
+var remoteUsers = [];
+
+// React classes define buildable components
+
+var ConversationTable = React.createClass({
+	render: function() {
+	return (
+		 <table>
+			<tr>
+				<td className="empty"></td>
+				<td className="empty"></td>
+				<td className="empty"></td>
+			</tr>
+			<tr>
+				<td className="empty"></td>
+				<td className="empty"></td>
+				<td className="empty"></td>
+			</tr>
+			<tr>
+				<td className="empty"></td>
+				<td className="empty"></td>
+				<td className="empty"></td>
+			</tr>
+		 </table>
+		 );
+	}
+});
+
+var Conversation = React.createClass({
+									 
+	// Close the conversation.
+	// TODO: reshuffle conversations to keep them organized.
+	// ALT: Replace empty space with empty box to fill table
+	close: function(){
+		// Mark the parent as empty so it can be reused
+		this.getDOMNode().parentNode.classList.add("empty");
+		this.getDOMNode().remove();
+	},
+	// Send message on enter
+	keypress: function(event) {
+		if(event.key == "Enter") {
+		 var message = event.target.value;
+		 event.target.value = "";
+	 
+		 // TODO: clean this up.
+		 var messageList = event.target.parentNode.parentNode.firstChild;
+	 
+		 // TODO: improve style
+		 var div = document.createElement("div");
+		 div.style.hidden = "true";
+		 React.render(
+					  <Message author={myName} text={message} />,
+					  div
+					  );
+		 messageList.appendChild( div.firstChild );
+		 div.remove;
+		 
+		 sendChatMessage(message, this.props.id);
+		}
+	},
+	// Render a conversation
+	render: function() {
+        return (
+				<div className="conversation" id={this.props.remote-user}>
+                    <div className="conversationHeader">
+						<div className="conversationHeaderExitButton" onClick={this.close}>X</div>
+                        <div className="conversationHeaderParticipant">
+                            {this.props.remote-user}
+                        </div>
+                    </div>
+                    <div className="conversationBody">
+						<div className="conversationBodyMessages">
+						</div>
+						<div className="conversationBodyInput" >
+							<input className="conversationBodyInputText" type="text" onKeyDown={this.keypress} />
+						</div>
+                    </div>
+                </div>
+        );
+    }
+});
+
+var Message = React.createClass({
+    render: function() {
+        return (
+                <div className="message">
+					<span className="message-author">{this.props.author}</span>
+					<span className="message-text">: {this.props.text}</span>
+                </div>
+        );
+    }
+});
+
+var socket = null;
+$(document).ready(function(){
+				  
+				  // Add event handler for dropdown
+				  $("#start-conversation-select").on( "change", function(event) {
+													 startConversation(event.target.value)
+													 } );
+				  
+				  // Add event handler for Name change
+				  $("#name-select-text-input").on("change",function(event){changeName(event.currentTarget.value)})
+				  
+				  
+				  /* Server callbacks */
+				  
+				  socket = io.connect();
+				  
+				  // Successful connect
+				  socket.on('connected', function(data) {
+							console.log('server: connected');
+							
+							// If name was registered, attempt to reclaim
+							if(myName) {
+								console.log("TODO: reclaim name");
+								//TODO: reclaim name
+							}
+							});
+				  
+				  // Response from registration message
+				  socket.on('registered', function(data) {
+							console.log('server: registered');
+							if( !data['success'] ) {
+								// Clear text field
+								alert("That name is not available");
+								$('#name-select-text-input')[0].value = ''
+							}
+							else {
+								myName = data['name'];
+								console.log("name changed to %s", myName);
+								updateUsers(data['users'])
+							}
+							});
+				  
+				  // Recieve a chat message from the server
+				  socket.on('chat-message', function(data) {
+							console.log('server: chat-message');
+							recieveChatMessage(data["name"],data["text"]);
+							});
+				  
+				  // Broadcast update for a remote user name change
+				  socket.on('name-changed', function(data) {
+							console.log('server: name-changed');
+							updateUser(data["oldName"],data["newName"]);
+							})
+				  
+				  // Broadcast update for a new remote user
+				  socket.on('new-user', function(data) {
+							console.log('server: new-user');
+							newUser(data["name"]);
+							})
+				  
+				  // Broadcast update for a dropped remote user
+				  socket.on('remove-user', function(data) {
+							console.log('server: remove-user');
+							removeUser(data["name"]);
+							})
+				  
+				  /* Initialize */
+				  
+				  React.render(
+							   <ConversationTable />,
+							   document.getElementById('content')
+							   );
+				  
+				  // Register with chat server
+//				  socket.emit('register', myName);
+});
+
+// Change user's name
+function changeName( newName ) {
+	var oldName = myName;
+	
+	//TODO: security review - user sourced data inserted as HTML
+	$(".message-author").filter(":contains('" + oldName + "')").html(name);
+	
+	socket.emit('register-name', oldName, newName);
+}
+
+// Create a new conversation window - no network activity
+function startConversation(remote-user) {
+	if(username === "") {
+		return;
+	}
+	
+	// If this conversation already exists, ignore
+	if( $(".conversation[id='" + remote-user + "']").length ) {
+		console.log("conversation with " +remote-user+ " already open");
+		return;
+	}
+	
+	// If there is an empty space available, use it
+	var emptySpace = $("td.empty").first();
+	if( emptySpace.length ) {
+		emptySpace.removeClass("empty");
+		React.render(
+					 <Conversation remote-user={remote-user} />,
+					 emptySpace[0]
+					 );
+	}
+	else {
+		console.log("Maximum number of conversations active.");
+	}
+	
+	// TODO: Dynamically expand with additional rows
+	
+	//	var rows = $("#content > table").children().children();
+	//	var tdElems = $("#content > table").children().children().children();
+	
+	//	var tdElemsCount = $("#content td").length;
+	////	var tdCount = tdElems.length;
+	//	var conversations = $("#content .conversation");
+	//
+	//	if( tdElemsCount === conversations.length ) {
+	//		var tableCol = Math.floor(tdElemsCount % 3);
+	//		var tableRow = Math.floor(tdElemsCount / 3);
+	//
+	//	}
+	
+	
+	console.log("conversation with %s started", remote-user);
+}
+
+function newUser( name ) {
+	if( name == myName ) {
+		return
+	}
+	console.log("New User: " + name)
+	
+	var option = document.createElement("option");
+	option.setAttribute("data-remote-user",name);
+	$(option).html(name);
+	$("#start-conversation-select")[0].appendChild(option);
+}
+
+// Update user name
+function updateUser( oldName, newName) {
+	if( oldName == myName || newName == myName ) {
+		return;
+	}
+	
+	remoteUsers.splice(remoteUsers.indexOf(oldName), 1);
+	remoteUsers.push(newName);
+	
+	//TODO: security review - user sourced data inserted as HTML
+	console.log("User name change: " + oldName + "    new name:" + newName);
+	$("option[data-remote-user='" + newName + "']").html(newName);
+	
+	// change conversation header
+	var oldName = $('#' + id + ' .conversationHeaderParticipant').html();
+	$('#' + id + ' .conversationHeaderParticipant').html(name);
+	
+	// change author on messages
+	$('#' + id + ' .message-author').filter(":contains('" + oldName + "')").html(name);
+}
+
+function updateUsers( names ) {
+	remoteUsers = [];
+	var optionlist = "<option></option>";
+	var i = 0;
+	while( i < names.length ) {
+		// Skip self
+		if( names[i] == myName ) {
+			i++;
+			continue;
+		}
+		remoteUsers.concat(names[i]);
+		optionlist += '<option data-remote-user="' + names[i] + '">' + names[i] + '</option>';
+		i++;
+	}
+	$("#start-conversation-select").html(optionlist);
+	console.log('updated user list and dropdown')
+}
+
+// TODO: consider folding into caller
+function sendChatMessage(text, recipientID) {
+	console.log("sending message: " + text);
+	socket.emit('chat-message',myId,recipientID,text);
+}
+
+function recieveChatMessage(senderName, text) {
+	if( senderName == myName ) {
+		return
+	}
+	
+	var messageList = $("#" + senderName + " .conversationBodyMessages")[0];
+
+	// Start conversation if needed.
+	if( !messageList || !(messageList.length) ) {
+		startConversation(senderName);
+		messageList = $("#" + senderName + " .conversationBodyMessages")[0];
+	}
+	
+	// TODO: Clean up required - style
+	// Instance message in view
+	var div = document.createElement("div");
+	div.style.hidden = "true";
+	React.render(
+				 <Message author={senderName} text={text} />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+	div.remove;
+}

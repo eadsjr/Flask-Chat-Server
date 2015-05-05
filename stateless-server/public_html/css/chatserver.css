@@ -1,0 +1,141 @@
+/*
+ Copyright 2015 Jason Randolph Eads
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+/*@font-face {*/
+/*	font-family: HelviticaNeue;*/
+/*	src: url(fonts/HelviticaNeue/HelviticaNeue.woff);*/
+/*}*/
+
+
+* {
+	font-family: HelviticaNeue, sans-serif;
+}
+
+/*
+ Formatting for the page header
+ */
+
+.header-title {
+	font-size: 40px;
+}
+
+.header-subtitle {
+	font-size: 28px;
+	margin-bottom: 14px;
+}
+
+#name-select-text-input, #start-conversation-select, .header-bar {
+	border: solid black 2px;
+}
+
+#name-select-text-input {
+	margin-right: 120px;
+}
+
+#start-conversation-select {
+	width: 120px;
+}
+
+.header-bar {
+	padding-bottom: 8px;
+	padding-top: 10px;
+	padding-left: 32px;
+	padding-right: 32px;
+	width: 595px;
+	margin-bottom: 30px;
+}
+
+
+
+/*
+ Formatting the conversation boxes
+ */
+
+.conversation {
+	border: solid black 2px;
+	width: 200px;
+	height: 250px;
+	margin-right: 20px;
+	margin-bottom: 20px;
+}
+
+.conversationHeader {
+	border-bottom: solid black 2px;
+	padding: 8px;
+	padding-left: 12px;
+	height: 22px;
+	overflow: hidden;
+}
+
+.conversationHeaderParticipant {
+	display: inline;
+	font-size: 22px;
+	font-style:	bold;
+}
+
+.conversationHeaderExitButton {
+	margin-top: -8px;
+	margin-right: -8px;
+	padding: 12px;
+	float: right;
+}
+
+.conversationBody {
+	display: flex;
+	flex-flow: column;
+	height: 210px;
+}
+
+.conversationBodyMessages {
+	overflow: scroll;
+	padding: 4px;
+	flex: 1 1 auto;
+}
+
+.conversationBodyInput {
+	border-top: solid black 2px;
+	padding: 0px;
+	flex: 0 0 26px;
+}
+
+.conversationBodyInputText {
+	width: 192px;
+	height: 18px;
+	margin: 0px;
+	border: 0px;
+	padding: 4px;
+	border-color: transparent;
+}
+
+
+
+/*
+ Message formatting
+ */
+
+.message {
+	padding: 2px;
+}
+
+.message-author {
+	font-style: italic;
+}
+
+.message-text {
+}
+
+
+
