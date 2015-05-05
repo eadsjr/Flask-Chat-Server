@@ -17,6 +17,8 @@ socketio = SocketIO(app)
 #@app.route('/')
 #@socketio.on('connect', '/chatserver')
 
+#TODO: Needs additional data sanitization
+
 
 # User data stored as { PublicID:(Username,PrivateID,ConnectionRoom) }
 # NOTE: should start empty in production
@@ -37,10 +39,13 @@ users = {
 def register_for_chat(name):
 	print 'registration requested'
 	
+	# Type scrubbing
+	name = str(name)
+	
 	# generate IDs
-	privateID = uuid.uuid1() # identifies sender
-	publicID = uuid.uuid1() # identifies to other clients
-	room = uuid.uuid1() # used to send to other clients
+	privateID = str(uuid.uuid1()) # identifies sender
+	publicID = str(uuid.uuid1()) # identifies to other clients
+	room = str(uuid.uuid1()) # used to send to other clients
 	
 	join_room(room)
 	users[publicID] = (name, privateID, room)
@@ -55,6 +60,9 @@ def register_for_chat(name):
 @socketio.on('retrieve-user-data')
 def retrieve_usernames(senderID):
 	print 'user data requested'
+	
+	
+	#TODO: scaling shokepoint
 	names = []
 	ids = []
 	for pubID in users:
@@ -74,10 +82,13 @@ def retrieve_usernames(senderID):
 
 @socketio.on('chat-message')
 def handle_event(senderID, recipientID, text):
+	
+	
 	print 'from %s to %s: %s' % (senderID, recipientID, text)
 	room = users[recipientID][2]
 	
-#	if(room)
+#	if(not room):
+#		print "Error: "
 
 	#TODO: authentication - verify senderID and connection match
 
@@ -89,20 +100,24 @@ def handle_event(senderID, recipientID, text):
 			break
 	emit('chat-message', {"id":publicID, "text":text}, broadcast=True)
 
+
 @socketio.on('change-name')
 def change_name(senderID, name):
-	
-	print('users %o' % users)
 	
 	#TODO: improve retrieval: scaling chokepoint
 	publicID = None
 	oldName = None
 	for pubID in users:
 		if( users[pubID][1] == senderID ):
-			users[pubID] = (name, senderID, users[pubID][2])
 			oldName = users[pubID][0]
 			publicID = pubID
+			users[pubID] = (name, senderID, users[pubID][2])
 			break
+
+	if(not oldName):
+		print("Error: Name change failed - No existing entry")
+		return
+
 	emit('name-changed',{'name':name, 'id':publicID},broadcast=True)
 	print 'user %s changed name to %s' % (oldName, name)
 
