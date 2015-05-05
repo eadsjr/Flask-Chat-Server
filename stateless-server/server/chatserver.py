@@ -33,19 +33,47 @@ socketio = SocketIO(app)
 # chat-message
 # remove-user
 
+#	socket.emit('register-name', oldName, newName);
+#	socket.emit('chat-message',  myName, recipientName, text);
+#	socket.emit('name-confirm',  myName);
 
-@socketio.on('register')
-def register_for_chat( name ):
-	print 'registration requested'
+#		socket.on('connected', function()
+#		socket.on('registered', function(data))
+#				  if( !data['success']
+#				  myName = data['name'];
+#				  updateUsers(data['users']
+#
+#		socket.on('chat-message', function(data))
+#				  recieveChatMessage(data["name"],data["text"]);
+#
+#		socket.on('name-changed', function(data))
+#							updateUser(data["oldName"],data["newName"]);
+#
+#		socket.on('new-user', function(data)
+#							newUser(data["name"]);
+#		
+#		socket.on('remove-user', function(data)
+#							removeUser(data["name"]);
+#				  
+#		socket.on('get-name', function(session) {
+#						    socket.emit('name-confirm',myName, session);
+
+@socketio.on('register-name')
+def register_for_chat( oldName, newName ):
 	
-	join_room(room)
-	users[publicID] = (name, privateID, room)
-	
-	print 'registered with public ID %s' % publicID
-	
-	emit('registered', {'privateID':privateID, 'publicID':publicID})
-	emit('new-user',{'name':name, 'id':publicID},broadcast=True)
-	print 'registration sent'
+	if(oldName):
+		print 'new registration for name %s' % newName
+	else:
+		print 'user %s requests name %s' % (oldName, newName)
+	#TODO - getNames, set up response cache on thread
+
+def register_for_chat_completion( oldName, newName, users ):
+	#TODO - check name collision, respond to registration, broadcast update
+	pass
+
+#emit('registered', {'privateID':privateID, 'publicID':publicID})
+#	emit('new-user',{'name':name, 'id':publicID},broadcast=True)
+#	print 'registration sent'
 
 
 @socketio.on('retrieve-user-data')

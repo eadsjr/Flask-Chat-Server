@@ -28,7 +28,7 @@
  
 	socket.emit('register-name', oldName, newName);
 	socket.emit('chat-message',  myName, recipientName, text);
-	socket.emit('name-confirm',  myName);
+	socket.emit('name-confirm',  myName, session);
  */
 
 var myName = null;
@@ -142,7 +142,7 @@ $(document).ready(function(){
 				  socket = io.connect();
 				  
 				  // Successful connect
-				  socket.on('connected', function(data) {
+				  socket.on('connected', function() {
 							console.log('server: connected');
 							
 							// If name was registered, attempt to reclaim
@@ -192,9 +192,9 @@ $(document).ready(function(){
 							})
 				  
 				  // Broadcast request for name
-				  socket.on('get-name', function() {
+				  socket.on('get-name', function(session) {
 							console.log('server: get-name');
-							socket.emit('name-confirm',myName);
+							socket.emit('name-confirm',myName,session);
 							})
 				  
 				  /* Initialize */
