@@ -2,11 +2,17 @@
  * Copyright 2015 Jason Randolph Eads - all rights reserved
  */
 
-// TODO: Current the pattern of using Username as conversation ID allows for multiple elements to end up with the same id. This should be rectified with something, like a counter.
+// TODO: Ensure DOM interactions play nice with React classes
 
-// TODO: Ensure dom interactions play nice with React classes
+// TODO: The React components need to be broken down further and logically decoupled
+
+// TODO: Break up into multiple files and require()
+
+// TODO: This version does not make much use of React's primary function... To conform, use React properties instead of JQuery
 
 var myName = "You";
+var myId = null;
+var otherUsers = [];
 
 
 // React classes define buildable components
@@ -17,18 +23,18 @@ var ConversationTable = React.createClass({
 		 <table>
 			 <tr>
 				<td>
-		 <Conversation participant="Jimmy" id="Jimmy" />
+		 <Conversation participant="Jimmy" id="JimmysPubID" />
 				</td>
 				<td>
-					<Conversation participant="Alucard" id="Alucard" />
+					<Conversation participant="Alucard" id="AlucardsPubID" />
 				</td>
 				<td>
-					<Conversation participant="Bernard" id="Bernard" />
+					<Conversation participant="Bernard" id="BernardsPubID" />
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<Conversation participant="Joel" id="Joel" />
+					<Conversation participant="Joel" id="JoelsPubID" />
 				</td>
 				<td className="empty"></td>
 				<td className="empty"></td>
@@ -60,23 +66,20 @@ var Conversation = React.createClass({
 									 
 										// TODO: clean this up.
 										var messageList = event.target.parentNode.parentNode.firstChild;
-										
+									
 									 
-									 
-									 
-										console.log("sending message: " + message);
 									 
 									 var div = document.createElement("div");
 									 div.style.hidden = "true";
-									 
 										React.render(
 													 <Message author={myName} text={message} />,
 													 div
 													 );
-									 
 									 messageList.appendChild( div.firstChild );
 									 
 									 div.remove;
+									 
+									 sendChatMessage(message, this.props.id);
 									 
 //										console.log("sent message: " + message);
 									 
@@ -183,30 +186,11 @@ var ConversationForm = React.createClass({
 
 console.log("running");
 
-// Communicate with backend via websocket
-var socket = '';
+var socket = null;
 $(document).ready(function(){
 				  console.log("document is ready");
-				  namespace = '';
 				  
-				  socket = io.connect();
-				  socket.on('connected', function(msg) {
-							console.log(msg);
-							console.log('Whee!');
-							socket.emit('event1', {data: 'Client connected!'});
-							});
-				  socket.on('message', function(msg) {
-							console.log(msg);
-							});
-				  socket.on('special', function(msg) {
-							console.log(msg);
-							});
-				  socket.on('retrieve-usernames-response', function(json) {
-							updateUsersDropdown(json.data);
-							});
-				  
-				  // Request usernames for dropdown
-				  socket.emit('retrieve-usernames');
+				  initializeDummyMessages();
 				  
 				  // Add event handler for dropdown
 				  $("#start-conversation-select").on( "change", function(event) {startConversation(event.currentTarget.value)} );
@@ -215,18 +199,193 @@ $(document).ready(function(){
 				  $("#name-select-text-input").on("change",function(event){changeName(event.currentTarget.value)})
 				  
 				  
-				  initializeDummyMessages();
+				  /* Server callbacks */
 				  
-				  });
+				  socket = io.connect();
+				  
+				  // Successful connect
+				  socket.on('connected', function(data) {
+							console.log("connected to server");
+							});
+				  
+				  // Recieve a chat message from the server
+				  socket.on('chat-message', function(data) {
+							console.log('server: chat-message')
+							console.log(data)
+							recieveChatMessage(data["id"],data["text"]);
+							});
+				  
+				  // Updated list of remote users
+				  socket.on('retrieve-user-data-response', function(data) {
+							console.log('server: retrieve-user-data-response')
+							updateUsers(data["names"],data["ids"]);
+							});
+				  
+				  // Broadcast update for a remote user name change
+				  socket.on('name-changed', function(data) {
+							updateUser(data["name"],data["id"]);
+							})
+				  
+				  // Broadcast update for a new remote user
+				  socket.on('new-user', function(data) {
+							updateUser(data["name"],data["id"]);
+							})
+				  
+				  // Response from successful registration
+				  socket.on('registered', function(data) {
+							myId = data;
+							console.log(data);
+							});
+				  
+				  
+				  /* Initialize from server */
+				  
+				  // Register with chat server
+				  socket.emit('register', myName);
+				  
+				  // Request usernames for dropdown
+				  socket.emit('retrieve-user-data', myId);
+				  
+});
 
 
-//
-function initializeDummyMessages() {
+
+// Change user's name
+// TODO: this will cause problems if your name is the same as someone else's
+function changeName(name) {
+	var oldName = myName;
+	myName = name;
 	
+	//TODO: security review - user sourced data inserted as HTML
+	$(".message-author span ").filter(":contains('" + oldName + "')").html(name);
+	
+	console.log("name changed to %s", name);
+}
+
+// Update user name
+function updateUser( name, id) {
+	//TODO: security review - user sourced data inserted as HTML
+	console.log("User updated: " + id)
+	$("option[data-chatid='" + id + "']").html(name)
+}
+
+// Create a new conversation window
+// TODO: Does not guard against multiple conversations with same person
+function startConversation(username) {
+	if(username === "") {
+		return;
+	}
+	console.log("conversation with %s started", username);
+	
+	userid = null;
+	
+	for(user in otherUsers) {
+		if(user["name"] === username) {
+			userid = user["id"]
+		}
+	}
+	
+	// If there is an empty space available, use it
+	var emptySpace = $("td.empty").first();
+	if( emptySpace.length ) {
+		emptySpace.removeClass("empty");
+		React.render(
+					 <Conversation participant={username} id={userid} />,
+					 emptySpace[0]
+					 );
+	}
+	else {
+		console.log("Maximum number of conversations active.");
+	}
+	
+	
+	// TODO: Dynamically expand with additional rows
+	
+	//	var rows = $("#content > table").children().children();
+	//	var tdElems = $("#content > table").children().children().children();
+	
+	//	var tdElemsCount = $("#content td").length;
+	////	var tdCount = tdElems.length;
+	//	var conversations = $("#content .conversation");
+	//
+	//	if( tdElemsCount === conversations.length ) {
+	//		var tableCol = Math.floor(tdElemsCount % 3);
+	//		var tableRow = Math.floor(tdElemsCount / 3);
+	//
+	//	}
+}
+
+function updateUsers( names, ids ) {
+	otherUsers = [];
+	var optionlist = "<option></option>";
+	var i = 0;
+	while( i < names.length ) {
+		otherUsers.concat({
+						  name: names[i],
+						  id: ids[i]});
+//		console.log( 'id'  + ids[i] );
+//		console.log( 'name'  + names[i] );
+		optionlist += '<option data-chatid="' + ids[i] + '">' + names[i] + '</option>';
+		i++;
+	}
+	$("#start-conversation-select").html(optionlist);
+	console.log('updated user list and dropdown')
+}
+
+// TODO: consider folding into caller
+function sendChatMessage(text, recipientID) {
+	console.log("sending message: " + text);
+	socket.emit('chat-message',myId,recipientID,text);
+}
+
+function recieveChatMessage(text, senderID, senderName) {
+	var messageList = $("#" + senderID + " .conversationBodyMessages")[0];
+
+	// drop message if from self
+	if( !messageList ) {
+		return;
+	}
+	// drop message if not in current coversation
+	if( !(messageList.length) ) {
+		return;
+	}
+	
+	// TODO: Clean up required - style
+	// Instance message in view
+	var div = document.createElement("div");
+	div.style.hidden = "true";
+	React.render(
+				 <Message author={senderName} text={text} />,
+				 div
+				 );
+	messageList.appendChild( div.firstChild );
+	div.remove;
+}
+
+function doDebug() {
+	console.log("button pressed");
+	
+	//var socket = io.connect();
+	
+	//socket.emit('debug','button pressed');
+	
+	var obj = {
+		text: "hello",
+		senderID:"XYZ",
+		recipientID:"ABC"
+	}
+	
+//	socket.emit('debug','button pressed');
+	socket.emit('debug',obj);
+}
+
+// Dummy messages for example and debug value.
+// TODO: Remove or relocate dummy text as needed
+function initializeDummyMessages() {
 	
 	var div = document.createElement("div");
 	div.style.hidden = "true";
-	var messageList = $("#Jimmy .conversationBodyMessages")[0];
+	var messageList = $("#JimmysPubID .conversationBodyMessages")[0];
 	
 	React.render(
 				 <Message author="Jimmy" text="Are Polysaccrides are bad for you?" />,
@@ -240,30 +399,30 @@ function initializeDummyMessages() {
 				 div
 				 );
 	messageList.appendChild( div.firstChild );
-
+	
 	React.render(
 				 <Message author="Jimmy" text="nevermind..." />,
 				 div
 				 );
 	messageList.appendChild( div.firstChild );
-
-	messageList = $("#Alucard .conversationBodyMessages")[0];
+	
+	messageList = $("#AlucardsPubID .conversationBodyMessages")[0];
 	
 	React.render(
 				 <Message author="You" text="Is it really you?" />,
 				 div
 				 );
 	messageList.appendChild( div.firstChild );
-
+	
 	React.render(
 				 <Message author="You" text="Hello?" />,
 				 div
 				 );
 	messageList.appendChild( div.firstChild );
-
 	
-	messageList = $("#Bernard .conversationBodyMessages")[0];
-
+	
+	messageList = $("#BernardsPubID .conversationBodyMessages")[0];
+	
 	React.render(
 				 <Message author="Bernard" text="I had a dream last night." />,
 				 div
@@ -276,7 +435,7 @@ function initializeDummyMessages() {
 				 );
 	messageList.appendChild( div.firstChild );
 	
-
+	
 	
 	React.render(
 				 <Message author="Bernard" text="The quick brown fox jumps over the lazy dog." />,
@@ -285,7 +444,7 @@ function initializeDummyMessages() {
 	messageList.appendChild( div.firstChild );
 	
 	
-	messageList = $("#Joel .conversationBodyMessages")[0];
+	messageList = $("#JoelsPubID .conversationBodyMessages")[0];
 	
 	
 	React.render(
@@ -293,7 +452,7 @@ function initializeDummyMessages() {
 				 div
 				 );
 	messageList.appendChild( div.firstChild );
-
+	
 	
 	
 	React.render(
@@ -301,77 +460,8 @@ function initializeDummyMessages() {
 				 div
 				 );
 	messageList.appendChild( div.firstChild );
-
+	
 	
 	div.remove;
-	
-	//							<Message author="Death" text="There is nothing more to say." />
 }
 
-// Change user's name
-function changeName(name) {
-	var oldName = myName;
-	myName = name;
-	
-	//TODO: security review - user sourced data inserted as HTML
-	$(".message-author span ").filter(":contains('" + oldName + "')").html(name);
-	
-	console.log("name changed to %s", name);
-}
-
-// Create a new conversation window
-// TODO: Does not guard against multiple conversations with same person
-function startConversation(username) {
-	if(username == "") {
-		return;
-	}
-	console.log("conversation with %s started", username);
-	//	$("#content > table");
-	
-	//	var rows = $("#content > table").children().children();
-	//	var tdElems = $("#content > table").children().children().children();
-	
-	
-	// If there is an empty space available, use it
-	var emptySpace = $("td.empty").first();
-	if( emptySpace.length ) {
-		emptySpace.removeClass("empty");
-		React.render(
-					 <Conversation participant={username} id={username} />,
-					 emptySpace[0]
-					 );
-	}
-	else {
-		console.log("Maximum number of conversations active.");
-	}
-	
-	// TODO: Dynamically expand with additional rows
-	
-	//	var tdElemsCount = $("#content td").length;
-	////	var tdCount = tdElems.length;
-	//	var conversations = $("#content .conversation");
-	//
-	//	if( tdElemsCount === conversations.length ) {
-	//		var tableCol = Math.floor(tdElemsCount % 3);
-	//		var tableRow = Math.floor(tdElemsCount / 3);
-	//
-	//	}
-}
-
-
-// unpacks usernames and updates the select box
-function updateUsersDropdown(data) {
-	var optionlist = "<option></option>";
-	for( elem in data ) {
-		optionlist += "<option>" + data[elem].username + "</option>";
-	}
-	$("#start-conversation-select").html(optionlist);
-}
-
-function doDebug() {
-	console.log("button pressed");
-	
-	//var socket = io.connect();
-	
-	socket.emit('event1','button pressed');
-}
