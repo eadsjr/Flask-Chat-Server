@@ -19,7 +19,7 @@ socket.on('chat-message', function(data) {
 		  recieveChatMessage(data["name"],data["text"]);
 		  });
 
-//							updateUsers(data["names"],data["ids"]);
+// updateUsers(data["names"],data["ids"]);
 
 // Broadcast update for a remote user name change
 socket.on('name-changed', function(data) {

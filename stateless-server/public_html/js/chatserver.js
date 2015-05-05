@@ -18,22 +18,17 @@
 
 // TODO: The React components need to be broken down further and logically decoupled
 
-// TODO: at list selection time, multiple users with same name can cause the wrong one to be selected
-
-// TODO: Having the same name as another user can cause UI disruption on rename
-
 // TODO: STYLE: Break up into multiple files and require()
 
 // TODO: STYLE: seperate network-active functions from non-network functions
 
 
-
-
 /*
- outgoing message types:
+	Outgoing Message Signatures:
  
 	socket.emit('register-name', oldName, newName);
-	chat-message
+	socket.emit('chat-message',  myName, recipientName, text);
+	socket.emit('name-confirm',  myName);
  */
 
 var myName = null;
@@ -94,7 +89,7 @@ var Conversation = React.createClass({
 		 messageList.appendChild( div.firstChild );
 		 div.remove;
 		 
-		 sendChatMessage(message, this.props.id);
+		 sendChatMessage(this.props.remote-user, message);
 		}
 	},
 	// Render a conversation
@@ -196,15 +191,18 @@ $(document).ready(function(){
 							removeUser(data["name"]);
 							})
 				  
+				  // Broadcast request for name
+				  socket.on('get-name', function() {
+							console.log('server: get-name');
+							socket.emit('name-confirm',myName);
+							})
+				  
 				  /* Initialize */
 				  
 				  React.render(
 							   <ConversationTable />,
 							   document.getElementById('content')
 							   );
-				  
-				  // Register with chat server
-//				  socket.emit('register', myName);
 });
 
 // Change user's name
@@ -274,7 +272,7 @@ function newUser( name ) {
 }
 
 // Update user name
-function updateUser( oldName, newName) {
+function updateUser( oldName, newName ) {
 	if( oldName == myName || newName == myName ) {
 		return;
 	}
@@ -287,11 +285,13 @@ function updateUser( oldName, newName) {
 	$("option[data-remote-user='" + newName + "']").html(newName);
 	
 	// change conversation header
-	var oldName = $('#' + id + ' .conversationHeaderParticipant').html();
-	$('#' + id + ' .conversationHeaderParticipant').html(name);
+	$('#' + oldName + ' .conversationHeaderParticipant').html(newName);
 	
 	// change author on messages
-	$('#' + id + ' .message-author').filter(":contains('" + oldName + "')").html(name);
+	$('#' + oldName + ' .message-author').filter(":contains('" + oldName + "')").html(newName);
+	
+	// change convrsation id
+	$('#' + oldName)[0].setAttribute('id',newName);
 }
 
 function updateUsers( names ) {
@@ -312,10 +312,10 @@ function updateUsers( names ) {
 	console.log('updated user list and dropdown')
 }
 
-// TODO: consider folding into caller
-function sendChatMessage(text, recipientID) {
+// TODO: REFACTOR: consider folding into caller
+function sendChatMessage(recipientName, text) {
 	console.log("sending message: " + text);
-	socket.emit('chat-message',myId,recipientID,text);
+	socket.emit('chat-message',myName,recipientName,text);
 }
 
 function recieveChatMessage(senderName, text) {
