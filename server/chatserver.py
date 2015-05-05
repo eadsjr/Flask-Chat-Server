@@ -77,6 +77,8 @@ def handle_event(senderID, recipientID, text):
 	print 'from %s to %s: %s' % (senderID, recipientID, text)
 	room = users[recipientID][2]
 	
+#	if(room)
+
 	#TODO: authentication - verify senderID and connection match
 
 	#TODO: improve retrieval: scaling chokepoint
@@ -89,14 +91,20 @@ def handle_event(senderID, recipientID, text):
 
 @socketio.on('change-name')
 def change_name(senderID, name):
+	
+	print('users %o' % users)
+	
 	#TODO: improve retrieval: scaling chokepoint
 	publicID = None
+	oldName = None
 	for pubID in users:
 		if( users[pubID][1] == senderID ):
 			users[pubID] = (name, senderID, users[pubID][2])
+			oldName = users[pubID][0]
 			publicID = pubID
 			break
 	emit('name-changed',{'name':name, 'id':publicID},broadcast=True)
+	print 'user %s changed name to %s' % (oldName, name)
 
 
 @socketio.on('connect')

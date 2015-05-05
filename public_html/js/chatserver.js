@@ -10,6 +10,8 @@
 
 // TODO: This version does not make much use of React's primary function... To conform, use React properties instead of JQuery
 
+// TODO: at list selection time, multiple users with same name can cause an issue
+
 var myName = "You";
 var myId = null;
 var otherUsers = [];
@@ -183,7 +185,6 @@ var ConversationForm = React.createClass({
 //*/
 
 
-
 console.log("running");
 
 var socket = null;
@@ -193,7 +194,11 @@ $(document).ready(function(){
 				  initializeDummyMessages();
 				  
 				  // Add event handler for dropdown
-				  $("#start-conversation-select").on( "change", function(event) {startConversation(event.currentTarget.value)} );
+				  $("#start-conversation-select").on( "change", function(event) {
+													 var name = event.target.value;
+													 var chatid = event.target.children[event.target.selectedIndex].getAttribute("data-chatid")
+													 startConversation(name, chatid)
+													 } );
 				  
 				  // Add event handler for Name change
 				  $("#name-select-text-input").on("change",function(event){changeName(event.currentTarget.value)})
@@ -259,6 +264,8 @@ function changeName(name) {
 	//TODO: security review - user sourced data inserted as HTML
 	$(".message-author span ").filter(":contains('" + oldName + "')").html(name);
 	
+	socket.emit('change-name', myId, name);
+	
 	console.log("name changed to %s", name);
 }
 
@@ -270,19 +277,15 @@ function updateUser( name, id) {
 }
 
 // Create a new conversation window
-// TODO: Does not guard against multiple conversations with same person
-function startConversation(username) {
+function startConversation(username,chatid) {
 	if(username === "") {
 		return;
 	}
-	console.log("conversation with %s started", username);
 	
-	userid = null;
-	
-	for(user in otherUsers) {
-		if(user["name"] === username) {
-			userid = user["id"]
-		}
+	// If this conversation already exists, ignore
+	if( $(".conversation[id='" + chatid + "']").length ) {
+		console.log("conversation with " +chatid+ " already open");
+		return;
 	}
 	
 	// If there is an empty space available, use it
@@ -290,7 +293,7 @@ function startConversation(username) {
 	if( emptySpace.length ) {
 		emptySpace.removeClass("empty");
 		React.render(
-					 <Conversation participant={username} id={userid} />,
+					 <Conversation participant={username} id={chatid} />,
 					 emptySpace[0]
 					 );
 	}
@@ -313,6 +316,9 @@ function startConversation(username) {
 	//		var tableRow = Math.floor(tdElemsCount / 3);
 	//
 	//	}
+	
+	
+	console.log("conversation with %s started", chatid);
 }
 
 function updateUsers( names, ids ) {
