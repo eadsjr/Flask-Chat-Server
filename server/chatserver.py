@@ -52,7 +52,7 @@ def register_for_chat(name):
 	
 	print 'registered with public ID %s' % publicID
 	
-	emit('registered', privateID)
+	emit('registered', {'privateID':privateID, 'publicID':publicID})
 	emit('new-user',{'name':name, 'id':publicID},broadcast=True)
 	print 'registration sent'
 
@@ -94,11 +94,13 @@ def handle_event(senderID, recipientID, text):
 
 	#TODO: improve retrieval: scaling chokepoint
 	publicID = None
+	name = None
 	for pubID in users:
 		if( users[pubID][1] == senderID ):
 			publicID = pubID
+			name = users[pubID][0]
 			break
-	emit('chat-message', {"id":publicID, "text":text}, broadcast=True)
+	emit('chat-message', {"name": name, "id":publicID, "text":text}, broadcast=True)
 
 
 @socketio.on('change-name')

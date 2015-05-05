@@ -12,8 +12,11 @@
 
 // TODO: at list selection time, multiple users with same name can cause an issue
 
+// TODO: seperate network-active functions from non-network functions
+
 var myName = "You";
 var myId = null;
+var myPublicId = null;
 var otherUsers = [];
 
 
@@ -124,8 +127,8 @@ var Message = React.createClass({
     render: function() {
         return (
                 <div className="message">
-					<span className="message-author">{this.props.author}: </span>
-					<span className="message-text"> {this.props.text}</span>
+					<span className="message-author">{this.props.author}</span>
+					<span className="message-text">: {this.props.text}</span>
                 </div>
                 );
     }
@@ -217,7 +220,7 @@ $(document).ready(function(){
 				  socket.on('chat-message', function(data) {
 							console.log('server: chat-message')
 							console.log(data)
-							recieveChatMessage(data["id"],data["text"]);
+							recieveChatMessage(data["text"],data["id"],data["name"]);
 							});
 				  
 				  // Updated list of remote users
@@ -233,13 +236,13 @@ $(document).ready(function(){
 				  
 				  // Broadcast update for a new remote user
 				  socket.on('new-user', function(data) {
-							updateUser(data["name"],data["id"]);
+							newUser(data["name"],data["id"]);
 							})
 				  
 				  // Response from successful registration
 				  socket.on('registered', function(data) {
-							myId = data;
-							console.log(data);
+							myId = data['privateID'];
+							myPublicId = data['publicID'];
 							});
 				  
 				  
@@ -262,21 +265,45 @@ function changeName(name) {
 	myName = name;
 	
 	//TODO: security review - user sourced data inserted as HTML
-	$(".message-author span ").filter(":contains('" + oldName + "')").html(name);
+	$(".message-author").filter(":contains('" + oldName + "')").html(name);
 	
 	socket.emit('change-name', myId, name);
 	
 	console.log("name changed to %s", name);
 }
 
-// Update user name
-function updateUser( name, id) {
-	//TODO: security review - user sourced data inserted as HTML
-	console.log("User updated: " + id)
-	$("option[data-chatid='" + id + "']").html(name)
+function newUser( name, id ) {
+	if( id == myPublicId ) {
+		return
+	}
+	console.log("New User: " + id)
+	
+	var option = document.createElement("option");
+	option.setAttribute("data-chatid",id);
+	$(option).html(name);
+	$("#start-conversation-select")[0].appendChild(option);
 }
 
-// Create a new conversation window
+// Update user name
+function updateUser( name, id) {
+	if( id == myPublicId ) {
+		return;
+	}
+	
+	//TODO: security review - user sourced data inserted as HTML
+	console.log("User updated: " + id);
+	$("option[data-chatid='" + id + "']").html(name);
+	
+	// change conversation header
+	var oldName = $('#' + id + ' .conversationHeaderParticipant').html();
+	$('#' + id + ' .conversationHeaderParticipant').html(name);
+	
+	// change author on messages
+	$('#' + id + ' .message-author').filter(":contains('" + oldName + "')").html(name);
+	//$('#f12aad38-f340-11e4-aabf-3c15c2b9bb5c .message-author').filter(":contains('RileyD')")
+}
+
+// Create a new conversation window - no network activity
 function startConversation(username,chatid) {
 	if(username === "") {
 		return;
@@ -300,7 +327,6 @@ function startConversation(username,chatid) {
 	else {
 		console.log("Maximum number of conversations active.");
 	}
-	
 	
 	// TODO: Dynamically expand with additional rows
 	
@@ -326,6 +352,11 @@ function updateUsers( names, ids ) {
 	var optionlist = "<option></option>";
 	var i = 0;
 	while( i < names.length ) {
+		// Skip self
+		if( ids[i] == myPublicId ) {
+			i++;
+			continue;
+		}
 		otherUsers.concat({
 						  name: names[i],
 						  id: ids[i]});
@@ -345,16 +376,22 @@ function sendChatMessage(text, recipientID) {
 }
 
 function recieveChatMessage(text, senderID, senderName) {
+	if( senderID == myPublicId ) {
+		return
+	}
+	
 	var messageList = $("#" + senderID + " .conversationBodyMessages")[0];
 
-	// drop message if from self
-	if( !messageList ) {
-		return;
+	// Start conversation if needed.
+	if( !messageList || !(messageList.length) ) {
+		startConversation(senderName, senderID);
+		messageList = $("#" + senderID + " .conversationBodyMessages")[0];
 	}
-	// drop message if not in current coversation
-	if( !(messageList.length) ) {
-		return;
-	}
+	
+	console.log("DEBUG")
+	console.log(text)
+	console.log(senderID)
+	console.log(senderName)
 	
 	// TODO: Clean up required - style
 	// Instance message in view
