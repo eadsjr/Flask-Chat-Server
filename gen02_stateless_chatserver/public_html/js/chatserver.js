@@ -171,7 +171,7 @@ $(document).ready(function(){
 				  // Recieve a chat message from the server
 				  socket.on('chat-message', function(data) {
 							console.log('server: chat-message');
-							recieveChatMessage(data["name"],data["text"]);
+							recieveChatMessage(data["sender"],data["recipient"],data["text"]);
 							});
 				  
 				  
@@ -229,7 +229,7 @@ function changeName( newName ) {
 
 // Create a new conversation window - no network activity
 function startConversation(remoteUser) {
-	if(username === "") {
+	if(remoteUser === "" || !remoteUser) {
 		return;
 	}
 	
@@ -289,7 +289,7 @@ function removeUser( name ) {
 	$("option[data-chatid='" + user + "']").remove();
 	
 	// inform local user of disconnect
-	recieveChatMessage(user, "{ user was disconnected }")
+	recieveChatMessage(user, myName, "{ user was disconnected }")
 }
 
 // Update user name
@@ -365,17 +365,22 @@ function sendChatMessage(recipientName, text) {
 	socket.emit('chat-message',myName,recipientName,text);
 }
 
-function recieveChatMessage(senderName, text) {
-	if( senderName == myName ) {
-		return
+function recieveChatMessage(sender, recipient, text) {
+	// Ignore your own messages
+	if( sender == myName ) {
+		return;
+	}
+	// Ignore messages for other people
+	if( recipient != myName ) {
+		return;
 	}
 	
-	var messageList = $("#" + senderName + " .conversationBodyMessages")[0];
+	var messageList = $("#" + sender + " .conversationBodyMessages")[0];
 
 	// Start conversation if needed.
 	if( !messageList || !(messageList.length) ) {
-		startConversation(senderName);
-		messageList = $("#" + senderName + " .conversationBodyMessages")[0];
+		startConversation(sender);
+		messageList = $("#" + sender + " .conversationBodyMessages")[0];
 	}
 	
 	// TODO: Clean up required - style
@@ -383,7 +388,7 @@ function recieveChatMessage(senderName, text) {
 	var div = document.createElement("div");
 	div.style.hidden = "true";
 	React.render(
-				 <Message author={senderName} text={text} />,
+				 <Message author={sender} text={text} />,
 				 div
 				 );
 	messageList.appendChild( div.firstChild );

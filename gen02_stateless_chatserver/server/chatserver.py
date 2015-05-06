@@ -26,7 +26,7 @@ app.add_url_rule('/', 'root', lambda: app.send_static_file('index.html'))
 socketio = SocketIO(app)
 
 # Number of seconds to wait for client pings
-REQUEST_TIMEOUT = 3.0
+REQUEST_TIMEOUT = 2.0
 
 # These short-lived sessions exist for the duration of an event, <5 seconds
 sessions = []
