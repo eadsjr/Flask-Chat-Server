@@ -15,144 +15,125 @@
  '''
 
 from flask import Flask
+from threading import Timer
 from flask.ext.socketio import SocketIO, emit
+import random
+import uuid
 
 app = Flask("ChatServer", static_url_path='', static_folder='../public_html/')
 app.add_url_rule('/', 'root', lambda: app.send_static_file('index.html'))
 
 socketio = SocketIO(app)
 
-#TODO: Needs additional data sanitization!
-
+# These short-lived sessions exist for the duration of an event, <5 seconds
+sessions = []
 
 # outgoing message types:
 #
-# get-name - broadcast
-# registered
-# new-user
-# chat-message
-# remove-user
+#	emit('users-update', {'users':users}, broadcast=True)
+#	emit('registered',{'success':True, 'name':newName,'users':mySession})
+#	emit('chat-message', {"sender": sender, "recipient":recipient, "text":text}, broadcast=True)
+#	emit('new-user', {'name':newName})
+#	emit('name-changed', {'name':newName})
 
-#	socket.emit('register-name', oldName, newName);
-#	socket.emit('chat-message',  myName, recipientName, text);
-#	socket.emit('name-confirm',  myName);
-
-#		socket.on('connected', function()
-#		socket.on('registered', function(data))
-#				  if( !data['success']
-#				  myName = data['name'];
-#				  updateUsers(data['users']
-#
-#		socket.on('chat-message', function(data))
-#				  recieveChatMessage(data["name"],data["text"]);
-#
-#		socket.on('name-changed', function(data))
-#							updateUser(data["oldName"],data["newName"]);
-#
-#		socket.on('new-user', function(data)
-#							newUser(data["name"]);
-#		
-#		socket.on('remove-user', function(data)
-#							removeUser(data["name"]);
-#				  
-#		socket.on('get-name', function(session) {
-#						    socket.emit('name-confirm',myName, session);
 
 @socketio.on('register-name')
 def register_for_chat( oldName, newName ):
 	
-	if(oldName):
+	if(not oldName):
 		print 'new registration for name %s' % newName
 	else:
 		print 'user %s requests name %s' % (oldName, newName)
-	#TODO - getNames, set up response cache on thread
 
-def register_for_chat_completion( oldName, newName, users ):
-	#TODO - check name collision, respond to registration, broadcast update
-	pass
-
-#emit('registered', {'privateID':privateID, 'publicID':publicID})
-#	emit('new-user',{'name':name, 'id':publicID},broadcast=True)
-#	print 'registration sent'
-
-
-@socketio.on('retrieve-user-data')
-def retrieve_usernames(senderID):
-	print 'user data requested'
+	# initiate session
+	session = uuid.uuid1()
+	sessions.append([session,[]])
+	socket.emit('get-name', session)
 	
+	Thread(4.0,register_for_chat_finish, args=[oldName,newName, session])
+
+# Runs after delay, collects resulting active connections
+def register_for_chat_finish( oldName, newName, session ):
 	
-	#TODO: scaling shokepoint
-	names = []
-	ids = []
-	for pubID in users:
-		if users[pubID][1] == senderID:
-			continue
-		names.append( (users[pubID][0]) )
-		ids.append( pubID )
-	emit('retrieve-user-data-response', {'names':names,'ids':ids})
-	print 'user data sent'
-
-
-
-
-@socketio.on('chat-message')
-def handle_event(senderID, recipientID, text):
-	
-	
-	print 'from %s to %s: %s' % (senderID, recipientID, text)
-	room = users[recipientID][2]
-	
-#	if(not room):
-#		print "Error: "
-
-	#TODO: authentication - verify senderID and connection match
-
-	#TODO: improve retrieval: scaling chokepoint
-	publicID = None
-	name = None
-	for pubID in users:
-		if( users[pubID][1] == senderID ):
-			publicID = pubID
-			name = users[pubID][0]
+	# Collect session
+	mySession = None
+	for s in sessions:
+		if s[0] == session:
+			mySession = s
 			break
-	emit('chat-message', {"name": name, "id":publicID, "text":text}, broadcast=True)
-
-
-@socketio.on('change-name')
-def change_name(senderID, name):
 	
-	#TODO: improve retrieval: scaling chokepoint
-	publicID = None
-	oldName = None
-	for pubID in users:
-		if( users[pubID][1] == senderID ):
-			oldName = users[pubID][0]
-			publicID = pubID
-			users[pubID] = (name, senderID, users[pubID][2])
-			break
+	# Check for name collision
+	if mySession:
+		for n in mySession:
+			if n == newName:
+				print 'name collision: registration failed'
+				users = mySession[1]
+				emit('registered',{'success':False, 'name':oldName, 'users':users})
+				return
 
+	# Respond to registration
+	users = mySession[1]
+	emit('registered',{'success':True, 'name':newName, 'users':users})
+
+	# Broadcast updated data to clients
 	if(not oldName):
-		print("Error: Name change failed - No existing entry")
-		return
+		emit('new-user', {'name':newName}, broadcast=True)
+	else:
+		emit('name-changed', {'name':newName}, broadcast=True)
 
-	emit('name-changed',{'name':name, 'id':publicID},broadcast=True)
-	print 'user %s changed name to %s' % (oldName, name)
+	# Reclaim memory
+	sessions.remove(mySession)
 
 
+# Relay for messages
+@socketio.on('chat-message')
+def handle_event(sender, recipient, text):
+	print 'message: from %s to %s: %s' % (sender, recipient, text)
+	emit('chat-message', {"sender": sender, "recipient":recipient, "text":text}, broadcast=True)
+
+# Callback from a general attendance check
+@socketio.on('name-confirm')
+def confirm_name(name, session):
+	for s in sessions:
+		if s[0] == session:
+			s[1].append(name)
+			break
+
+# Echo connection confirmation
 @socketio.on('connect')
 def connect():
-	emit('connected', {'data':'Connected to ChatServer'})
+	emit('connected')
 	print 'connected to client'
 
-
+# Check to see if client is gone, then inform clients of change
 @socketio.on('disconnect')
 def disconnect():
 	print 'disconnected from client'
+	
+	# initiate session
+	session = uuid.uuid1()
+	sessions.append([session,[]])
+	emit('get-name', session)
 
 
-@socketio.on('debug')
-def handle_event(message):
-	print 'recieved debug message "%s"' % message
+	Thread(4.0,disconnect_finish, args=[session])
+	#TODO: scan for names and send out updates
+
+def disconnect_finish(session):
+	
+	# Collect session
+	mySession = None
+	for s in sessions:
+		if s[0] == session:
+			mySession = s
+			break
+
+	# Send user list update
+	users = mySession[1]
+	emit('users-update', {'users':users}, broadcast=True)
+
+	#reclaim memory
+	sessions.remove(mySession)
 
 # Run if not loaded as a module
 if __name__ == '__main__':

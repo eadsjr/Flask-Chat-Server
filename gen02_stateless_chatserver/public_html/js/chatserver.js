@@ -89,17 +89,17 @@ var Conversation = React.createClass({
 		 messageList.appendChild( div.firstChild );
 		 div.remove;
 		 
-		 sendChatMessage(this.props.remote-user, message);
+		 sendChatMessage(this.props.remoteUser, message);
 		}
 	},
 	// Render a conversation
 	render: function() {
         return (
-				<div className="conversation" id={this.props.remote-user}>
+				<div className="conversation" id={this.props.remoteUser}>
                     <div className="conversationHeader">
 						<div className="conversationHeaderExitButton" onClick={this.close}>X</div>
                         <div className="conversationHeaderParticipant">
-                            {this.props.remote-user}
+                            {this.props.remoteUser}
                         </div>
                     </div>
                     <div className="conversationBody">
@@ -173,6 +173,13 @@ $(document).ready(function(){
 							recieveChatMessage(data["name"],data["text"]);
 							});
 				  
+				  
+				  // Broadcast update for user list
+				  socket.on('users-update',function(data) {
+							console.log('users-update');
+							dropUsers(data["users"])
+							})
+				  
 				  // Broadcast update for a remote user name change
 				  socket.on('name-changed', function(data) {
 							console.log('server: name-changed');
@@ -186,10 +193,10 @@ $(document).ready(function(){
 							})
 				  
 				  // Broadcast update for a dropped remote user
-				  socket.on('remove-user', function(data) {
-							console.log('server: remove-user');
-							removeUser(data["name"]);
-							})
+//				  socket.on('remove-user', function(data) {
+//							console.log('server: remove-user');
+//							removeUser(data["name"]);
+//							})
 				  
 				  // Broadcast request for name
 				  socket.on('get-name', function(session) {
@@ -216,14 +223,14 @@ function changeName( newName ) {
 }
 
 // Create a new conversation window - no network activity
-function startConversation(remote-user) {
+function startConversation(remoteUser) {
 	if(username === "") {
 		return;
 	}
 	
 	// If this conversation already exists, ignore
-	if( $(".conversation[id='" + remote-user + "']").length ) {
-		console.log("conversation with " +remote-user+ " already open");
+	if( $(".conversation[id='" + remoteUser + "']").length ) {
+		console.log("conversation with " +remoteUser+ " already open");
 		return;
 	}
 	
@@ -232,7 +239,7 @@ function startConversation(remote-user) {
 	if( emptySpace.length ) {
 		emptySpace.removeClass("empty");
 		React.render(
-					 <Conversation remote-user={remote-user} />,
+					 <Conversation remoteUser={remoteUser} />,
 					 emptySpace[0]
 					 );
 	}
@@ -256,7 +263,7 @@ function startConversation(remote-user) {
 	//	}
 	
 	
-	console.log("conversation with %s started", remote-user);
+	console.log("conversation with %s started", remoteUser);
 }
 
 function newUser( name ) {
@@ -269,6 +276,15 @@ function newUser( name ) {
 	option.setAttribute("data-remote-user",name);
 	$(option).html(name);
 	$("#start-conversation-select")[0].appendChild(option);
+}
+
+// Removes a user from the UI, gracefully
+function removeUser( name ) {
+	// remove them from dropdown
+	$("option[data-chatid='" + user + "']").remove();
+	
+	// inform local user of disconnect
+	recieveChatMessage(user, "{ user was disconnected }")
 }
 
 // Update user name
@@ -294,6 +310,26 @@ function updateUser( oldName, newName ) {
 	$('#' + oldName)[0].setAttribute('id',newName);
 }
 
+// Deletes any users that are no longer connected
+// TODO: Consider expanding to fill in missing users
+function dropUsers( names ) {
+	
+	// Primarily for detecting deletions, so skip this case
+	if( names.length == remoteUsers.length) {
+		return
+	}
+	
+	var missing_names = [];
+	var userSet = Set(remoteUsers)
+	for(user in names) {
+		// If there is a missing user
+		if( !(userSet.prototype.has(user)) ) {
+			removeUser(user);
+		}
+	}
+}
+
+// Populates the dropdown menu
 function updateUsers( names ) {
 	remoteUsers = [];
 	var optionlist = "<option></option>";
