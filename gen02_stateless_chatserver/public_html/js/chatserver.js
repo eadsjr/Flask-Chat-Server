@@ -157,6 +157,7 @@ $(document).ready(function(){
 							console.log('server: registered');
 							if( !data['success'] ) {
 								// Clear text field
+								console.log("That name is not available: %s", myName);
 								alert("That name is not available");
 								$('#name-select-text-input')[0].value = ''
 							}
@@ -176,7 +177,7 @@ $(document).ready(function(){
 				  
 				  // Broadcast update for user list
 				  socket.on('users-update',function(data) {
-							console.log('users-update');
+							console.log('server: users-update');
 							dropUsers(data["users"])
 							})
 				  
@@ -201,7 +202,11 @@ $(document).ready(function(){
 				  // Broadcast request for name
 				  socket.on('get-name', function(session) {
 							console.log('server: get-name');
-							socket.emit('name-confirm',myName,session);
+							
+							if(myName) {
+								console.log('sending ' + myName + ' and ' + session );
+								socket.emit('name-confirm',myName,session);
+							}
 							})
 				  
 				  /* Initialize */
@@ -289,7 +294,12 @@ function removeUser( name ) {
 
 // Update user name
 function updateUser( oldName, newName ) {
+	console.log('oldname: %s    ...  newName: %s    .... myName: %s', oldName,newName,myName)
 	if( oldName == myName || newName == myName ) {
+		return;
+	}
+	if( !oldName || !newName ) {
+		console.log('input is undefined in update user!')
 		return;
 	}
 	
@@ -315,7 +325,7 @@ function updateUser( oldName, newName ) {
 function dropUsers( names ) {
 	
 	// Primarily for detecting deletions, so skip this case
-	if( names.length == remoteUsers.length) {
+	if( names.length == remoteUsers.length || !remoteUsers.length) {
 		return
 	}
 	
@@ -334,6 +344,7 @@ function updateUsers( names ) {
 	remoteUsers = [];
 	var optionlist = "<option></option>";
 	var i = 0;
+	console.log('recieved names: ' + names);
 	while( i < names.length ) {
 		// Skip self
 		if( names[i] == myName ) {
