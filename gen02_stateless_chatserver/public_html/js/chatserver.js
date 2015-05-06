@@ -14,9 +14,13 @@
  limitations under the License.
  */
 
+// TODO: URGENT: BUG: Occasionally when server resets members lose a few messages to each other. Appears to fix when each member of conversation has sent at least one message since connection was lost (including the current one).
+
 // TODO: This version does not make much use of React's primary function... To conform, use React properties instead of JQuery
 
 // TODO: The React components need to be broken down further and logically decoupled
+
+// TODO: room for improvement on chat window layout
 
 // TODO: STYLE: Break up into multiple files and require()
 
@@ -359,7 +363,6 @@ function updateUsers( names ) {
 	console.log('updated user list and dropdown')
 }
 
-// TODO: REFACTOR: consider folding into caller
 function sendChatMessage(recipientName, text) {
 	console.log("sending message: " + text);
 	socket.emit('chat-message',myName,recipientName,text);
