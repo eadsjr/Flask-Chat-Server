@@ -1,0 +1,1 @@
+User namechange catches old self identity: bug :
